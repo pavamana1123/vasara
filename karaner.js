@@ -36,7 +36,15 @@ function getKarana(line) {
 
 // Function to generate dates from today until December 31, 2025
 function generateDates() {
-  const startDate = moment()
+
+  var ld
+  try {
+    ld = fs.readFileSync('lastdate.txt', 'utf-8')
+  }catch {
+    ld=""
+  }
+
+  const startDate = ld==""?moment():moment(ld)
   const endDate = moment('2050-12-31')
   const dates = []
 
@@ -52,11 +60,16 @@ function generateDates() {
 async function generateDateKaranaMap() {
   const baseUrl = 'https://www.drikpanchang.com/panchang/month-panchang.html'
   const dates = generateDates()
-  const dateKaranaMap = {}
+  var dateKaranaMap = {}
+
+  try {
+    dateKaranaMap = JSON.parse(fs.readFileSync('karana.json', 'utf-8'))
+  }catch{
+    dateKaranaMap = {}
+  }
 
   for (const date of dates) {
     const url = `${baseUrl}?date=${date}&epoch=${moment().unix()}`
-    console.log(url)
     const content = await fetchContent(url)
     const karana = extractKarana(content)
 
