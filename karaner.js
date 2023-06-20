@@ -18,20 +18,25 @@ async function fetchContent(url) {
 function extractKarana(content) {
   const dom = new JSDOM(content)
   const body = dom.window.document.querySelector('body')
-  return getKarana(body.textContent)
+  return getKarana(body.textContent.replaceAll(/\n/g, "").replaceAll(/ {1,}/g, " "))
 }
 
-function getKarana(line) {
-  const pattern = /Karana([A-Za-z]+) upto (\d{1,2}:\d{2} (?:AM|PM))/g
-  const matches = [...line.matchAll(pattern)]
+function getKarana(text) {
+  var regex = /FirstKarana:([A-Za-z]+)[0-9]+:([0-9]+:[0-9]+)/g
 
-  const karanaArray = matches.map(match => {
-    const karana = match[1] // Extracted Karana value
-    const time = match[2] // Extracted time value
-    return { [karana]: time }
-  })
+  var matches = []
+  var match
 
-  return karanaArray
+  while ((match = regex.exec(text)) !== null) {
+    var karana = match[1]
+    var startTime = match[2]
+
+    matches.push({
+      [karana]: startTime
+    })
+  }
+
+  return matches
 }
 
 // Function to generate dates from today until December 31, 2025
@@ -49,7 +54,7 @@ function generateDates() {
   const dates = []
 
   while (startDate.isSameOrBefore(endDate)) {
-    dates.push(startDate.format('DD/MM/YYYY'))
+    dates.push(startDate.format('DD-MM-YYYY'))
     startDate.add(1, 'day')
   }
 
@@ -58,7 +63,7 @@ function generateDates() {
 
 // Main function to fetch content, extract Karana, and create the date: karana object
 async function generateDateKaranaMap() {
-  const baseUrl = 'https://www.drikpanchang.com/panchang/month-panchang.html'
+  const baseUrl = 'https://www.mpanchang.com/panchang/today-panchang/'
   const dates = generateDates()
   var dateKaranaMap = {}
 
@@ -74,10 +79,10 @@ async function generateDateKaranaMap() {
     const karana = extractKarana(content)
 
     if(karana.length==0){
-      fs.writeFile('lastdate.txt', moment(date, "DD/MM/YYYY").format("YYYY-MM-DD"), 'utf8', ()=>{})
+      fs.writeFile('lastdate.txt', moment(date, "DD-MM-YYYY").format("YYYY-MM-DD"), 'utf8', ()=>{})
       const dom = new JSDOM(content)
       const body = dom.window.document.querySelector('body')
-      fs.writeFile('content.txt', body.textContent, 'utf8', ()=>{})
+      fs.writeFile('content.txt', body.textContent.replaceAll(/\n/g, "").replaceAll(/ {1,}/g, " "), 'utf8', ()=>{})
       fs.writeFile('index.html', content, 'utf8', ()=>{})
       throw new Error("empty karana "+date)
     }
