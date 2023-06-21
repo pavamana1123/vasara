@@ -18,25 +18,14 @@ async function fetchContent(url) {
 function extractKarana(content) {
   const dom = new JSDOM(content)
   const body = dom.window.document.querySelector('body')
-  return getKarana(body.textContent.replaceAll(/\n/g, "").replaceAll(/ {1,}/g, " "))
+  return getKarana(body.textContent.replaceAll(/\n/g, "").replaceAll(/ /g, ""))
 }
 
 function getKarana(text) {
-  var regex = /FirstKarana:([A-Za-z]+)[0-9]+:([0-9]+:[0-9]+)/g
+  var regex = /FirstKarana:(.*?)upto(\d{1,2}:\d{1,2})SecondKarana:(.*?)upto(\d{1,2}:\d{1,2})/g
 
-  var matches = []
-  var match
-
-  while ((match = regex.exec(text)) !== null) {
-    var karana = match[1]
-    var startTime = match[2]
-
-    matches.push({
-      [karana]: startTime
-    })
-  }
-
-  return matches
+  var match = regex.exec(text)
+  return JSON.parse(JSON.stringify([match[1], match[2], match[3], match[4]]))
 }
 
 // Function to generate dates from today until December 31, 2025
@@ -82,7 +71,7 @@ async function generateDateKaranaMap() {
       fs.writeFile('lastdate.txt', moment(date, "DD-MM-YYYY").format("YYYY-MM-DD"), 'utf8', ()=>{})
       const dom = new JSDOM(content)
       const body = dom.window.document.querySelector('body')
-      fs.writeFile('content.txt', body.textContent.replaceAll(/\n/g, "").replaceAll(/ {1,}/g, " "), 'utf8', ()=>{})
+      fs.writeFile('content.txt', body.textContent.replaceAll(/\n/g, "").replaceAll(/ /g, ""), 'utf8', ()=>{})
       fs.writeFile('index.html', content, 'utf8', ()=>{})
       throw new Error("empty karana "+date)
     }
