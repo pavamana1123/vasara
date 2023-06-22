@@ -39,7 +39,7 @@ function generateDates() {
   }
 
   const startDate = ld==""?moment():moment(ld)
-  const endDate = moment('2050-12-31')
+  const endDate = moment('2051-06-20')
   const dates = []
 
   while (startDate.isSameOrBefore(endDate)) {
@@ -62,9 +62,13 @@ async function generateDateKaranaMap() {
     dateKaranaMap = {}
   }
 
-  for (const date of dates) {
+  for (var i=0; i<dates.length; i++) {
+    var date = dates[i]
     const url = `${baseUrl}?date=${date}&epoch=${moment().unix()}`
     const content = await fetchContent(url)
+    if(!content){
+      i--
+    }
     const karana = extractKarana(content)
 
     if(karana.length==0){
@@ -78,6 +82,7 @@ async function generateDateKaranaMap() {
 
     dateKaranaMap[moment(date, "DD/MM/YYYY").format("YYYY-MM-DD")] = karana
     createKaranaFile(dateKaranaMap)
+    fs.writeFile('lastdate.txt', moment(date, "DD-MM-YYYY").format("YYYY-MM-DD"), 'utf8', ()=>{})
   }
   // return dateKaranaMap
 }

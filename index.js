@@ -67,8 +67,8 @@ function extractMasaDetails(line) {
         const gaudiya = match[1].trim();
         const traditional = match[2] || gaudiya;
         return {
-        gaudiya,
-        traditional
+          gaudiya,
+          traditional
         };
     }
     return null;
@@ -100,6 +100,14 @@ function isRemarksLine(line, numSpaces) {
     return regex.test(line) && line[numSpaces]!=" "
 }
 
+var karana = {}
+
+try {
+  karana = JSON.parse(fs.readFileSync('karana.json', 'utf-8'))
+}catch(e){
+  throw e
+}
+
 // Read the calendar text from file
 fs.readFile('cal.txt', 'utf8', (err, data) => {
   if (err) {
@@ -121,7 +129,13 @@ fs.readFile('cal.txt', 'utf8', (err, data) => {
   for (var line of lines) {
 
     if(isMasaLine(line)){
-        masa = extractMasaDetails(line)
+        var m = extractMasaDetails(line)
+        if(m.gaudiya=="Purusottama-adhika"){
+          masa.gaudiya="Purusottama"
+          masa.traditional=`Adhika ${masa.traditional}`
+          continue
+        }
+        masa = m
         continue
     }
 
@@ -153,12 +167,13 @@ fs.readFile('cal.txt', 'utf8', (err, data) => {
       rtu: rtuMap[masa.traditional],
       gaudiyaMasa: (masa.gaudiya || null),
       traditionalMasa: (masa.traditional || null),
-      gaudiyaPaksha: line.charAt(pakshaIndex)=="G"?"Gaura":"Krishna",
-      traditionalPaksha: line.charAt(pakshaIndex)=="G"?"Shukla":"Krishna",
+      gaudiyaPaksha: line.charAt(pakshaIndex-1)=="G"?"Gaura":"Krishna",
+      traditionalPaksha: line.charAt(pakshaIndex-1)=="G"?"Shukla":"Krishna",
       tithi: line.substring(tithiIndex, pakshaIndex-1).trim(),
       vasara: vedicWeekdays[dayOfWeek],
       nakshatra: line.substring(nakshatraIndex).replace(/\*/, '').trim(),
       yoga: line.substring(pakshaIndex, nakshatraIndex).trim(),
+      karana: karana[formattedDate],
       fast: line.trim().endsWith("*")
     }
 
@@ -167,7 +182,7 @@ fs.readFile('cal.txt', 'utf8', (err, data) => {
   }
 
   // Generate the JavaScript code
-  const jsCode = `var cal = ${JSON.stringify(calendarEntries, null, 2)}`
+  const jsCode = `var calendarData = ${JSON.stringify(calendarEntries, null, 2)}`
 
   // Save the JavaScript code to cal.js
   fs.writeFile('cal.js', jsCode, err => {
