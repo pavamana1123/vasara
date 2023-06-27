@@ -50,6 +50,10 @@ function generateDates() {
   return dates
 }
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Main function to fetch content, extract Karana, and create the date: karana object
 async function generateDateKaranaMap() {
   const baseUrl = 'https://www.mpanchang.com/panchang/today-panchang/'
@@ -67,6 +71,7 @@ async function generateDateKaranaMap() {
     const url = `${baseUrl}?date=${date}&epoch=${moment().unix()}`
     const content = await fetchContent(url)
     if(!content){
+      await delay(60000)
       i--
     }
     const karana = extractKarana(content)
