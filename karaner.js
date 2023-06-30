@@ -39,7 +39,7 @@ function generateDates() {
   }
 
   const startDate = ld==""?moment():moment(ld)
-  const endDate = moment('2051-06-20')
+  const endDate = moment('2051-12-20')
   const dates = []
 
   while (startDate.isSameOrBefore(endDate)) {
@@ -71,6 +71,7 @@ async function generateDateKaranaMap() {
     const url = `${baseUrl}?date=${date}&epoch=${moment().unix()}`
     const content = await fetchContent(url)
     if(!content){
+      console.log(new Date(), `rate limited`)
       await delay(60000)
       i--
     }
