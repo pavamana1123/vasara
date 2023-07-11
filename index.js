@@ -134,16 +134,16 @@ const dia = {
   },
   karana: {
     Gara: 'Garaja',
-    Vanija: 'Vaṇija',
-    Vishti: 'Viṣṭi',
+    Vanij: 'Vaṇija',
+    Visti: 'Viṣṭi',
     Bava: 'Bava',
-    Baalava: 'Bālava',
-    Kauvala: 'Kaulava',
+    Balava: 'Bālava',
+    Kaulava: 'Kaulava',
     Taitila: 'Taitila',
-    Sakuna: 'Śakuni',
-    Chatushpada: 'Ćatuṣpāda',
+    Sakuni: 'Śakuni',
+    Catuspada: 'Ćatuṣpāda',
     Naga: 'Nāga',
-    Kinstughna: 'Kiṃstughna'
+    Kintughna: 'Kiṃstughna'
   },
   rtu: {
     Grishma: 'Gṛīṣma',
