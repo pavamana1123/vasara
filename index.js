@@ -135,7 +135,7 @@ const dia = {
   karana: {
     Gara: 'Garaja',
     Vanij: 'Vaṇija',
-    Visti: 'Viṣṭi',
+    Visti: 'Bhadrā',
     Bava: 'Bava',
     Balava: 'Bālava',
     Kaulava: 'Kaulava',
